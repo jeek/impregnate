@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+
+import argparse
+import png
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Hide one png inside another and/or hide a file.')
+    parser.add_argument('-i', '--imagefile', type=str, help='image file to use as input')
+    parser.add_argument('-o', '--outfile', type=str, required=True, help='filename to output to')
+    parser.add_argument('-d', '--debug', action='store_const', const=True, default=False, help='show debug info')
+    if parser.parse_args().debug:
+        print parser.parse_args()
+    (width, height, pixels, meta) = png.Reader(parser.parse_args().imagefile).asRGBA()
+    final = []
+    for i in pixels:
+        newrow = []
+        for j in range(0, len(i)):
+            newrow.append((i[j]) % 256)
+        if parser.parse_args().debug:
+            print newrow
+        final.append(newrow)
+    png.from_array(final, mode="RGBA;8").save(parser.parse_args().outfile)
