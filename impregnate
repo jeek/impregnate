@@ -8,6 +8,7 @@ if __name__ == "__main__":
     parser.add_argument('-m', '--mainimage', type=str, required=True, help='main image file')
     parser.add_argument('-i', '--secretimage', type=str, required=True, help='image file to hide')
     parser.add_argument('-o', '--outfile', type=str, required=True, help='filename to output to')
+    parser.add_argument('-a', '--zipfile', type=str, required=True, help='zip file to attach')
     parser.add_argument('-d', '--debug', action='store_const', const=True, default=False, help='show debug info')
     if parser.parse_args().secretimage != None:
         if parser.parse_args().debug:
@@ -16,7 +17,8 @@ if __name__ == "__main__":
         (width2, height2, pixels2, meta2) = png.Reader(parser.parse_args().secretimage).asRGBA8()
         if width != width2 or height != height2:
             die("Image size mismatch")
-        print width, height
+        if parser.parse_args().debug:
+            print width, height
         final = []
         for i in pixels:
             other = pixels2.next()
@@ -27,3 +29,8 @@ if __name__ == "__main__":
                 print newrow
             final.append(newrow)
         png.from_array(final, mode="RGBA;16").save(parser.parse_args().outfile)
+        firstfile = open(parser.parse_args().outfile, "a")
+        secondfile = open(parser.parse_args().zipfile, "r")
+        firstfile.write(secondfile.read())
+        firstfile.close()
+        secondfile.close()
